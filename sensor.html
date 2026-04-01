@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Mattress Pad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body class="bg-slate-900 h-screen w-screen overflow-hidden flex flex-col font-mono text-white select-none">
+    
+    <div class="text-center py-4 bg-black/50 border-b border-cyan-500/30">
+        <h1 class="text-cyan-400 font-bold tracking-widest">SMART MATTRESS SENSOR</h1>
+        <p id="status" class="text-[10px] text-green-400 animate-pulse">CONNECTING...</p>
+    </div>
+
+    <div class="flex-grow grid grid-cols-1 grid-rows-4 gap-2 p-4">
+        <button id="head" class="zone-btn bg-slate-800 rounded-xl border-2 border-slate-600 active:bg-red-500 active:border-red-400 transition-colors flex items-center justify-center text-2xl font-bold tracking-widest text-slate-400 active:text-white uppercase">Head</button>
+        <button id="elbow" class="zone-btn bg-slate-800 rounded-xl border-2 border-slate-600 active:bg-red-500 active:border-red-400 transition-colors flex items-center justify-center text-2xl font-bold tracking-widest text-slate-400 active:text-white uppercase">Elbows</button>
+        <button id="buttocks" class="zone-btn bg-slate-800 rounded-xl border-2 border-slate-600 active:bg-red-500 active:border-red-400 transition-colors flex items-center justify-center text-2xl font-bold tracking-widest text-slate-400 active:text-white uppercase">Sacral</button>
+        <button id="heel" class="zone-btn bg-slate-800 rounded-xl border-2 border-slate-600 active:bg-red-500 active:border-red-400 transition-colors flex items-center justify-center text-2xl font-bold tracking-widest text-slate-400 active:text-white uppercase">Heels</button>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBaOZyUjMHAd3cgml0z8Ah3sFSeC3odeYc",
+            authDomain: "codeblue-11dfa.firebaseapp.com",
+            databaseURL: "https://codeblue-11dfa-default-rtdb.firebaseio.com",
+            projectId: "codeblue-11dfa",
+            storageBucket: "codeblue-11dfa.firebasestorage.app",
+            messagingSenderId: "516581634351",
+            appId: "1:516581634351:web:c60a3fa8206a0aba1031da"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        document.getElementById('status').innerText = "LINK ESTABLISHED";
+
+        // PRESSURE BUTTONS
+        const zones = document.querySelectorAll('.zone-btn');
+        zones.forEach(zone => {
+            zone.addEventListener('touchstart', (e) => {
+                e.preventDefault(); 
+                db.ref('bed/' + zone.id).set({ pressure: 95 });
+                if(navigator.vibrate) navigator.vibrate(50); 
+            });
+            zone.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                db.ref('bed/' + zone.id).set({ pressure: 20 });
+            });
+        });
+
+        // GYROSCOPE ROTATION
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (event) => {
+                db.ref('bed/rotation').set({
+                    beta: Math.round(event.beta || 0),
+                    gamma: Math.round(event.gamma || 0)
+                });
+            }, true);
+        }
+    </script>
+</body>
+</html>
